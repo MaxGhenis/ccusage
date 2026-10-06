@@ -433,7 +433,16 @@ async function readSessionFileMetadata(
 				metadataId = id;
 			}
 
-			forkedFromId = asNonEmptyString(payload?.forked_from_id);
+			const threadSpawn = isRecord(payload?.source)
+				? isRecord(payload.source.subagent)
+					? isRecord(payload.source.subagent.thread_spawn)
+						? payload.source.subagent.thread_spawn
+						: undefined
+					: undefined
+				: undefined;
+			forkedFromId =
+				asNonEmptyString(payload?.forked_from_id) ??
+				asNonEmptyString(threadSpawn?.parent_thread_id);
 			break;
 		}
 	} catch (error) {
